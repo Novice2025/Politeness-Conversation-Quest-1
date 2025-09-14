@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politeness & Conversation Quest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: #fff;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: #2a2a2a;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .question-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 1.5rem;
+        }
+        .question-text-pt {
+            color: #ffeb3b; /* Yellow for Portuguese */
+        }
+        .question-text-en {
+            color: #92d4ee; /* Lighter blue for English */
+        }
+        input[type="text"] {
+            background-color: #444;
+            border: 1px solid #666;
+            color: #fff;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #818cf8;
+        }
+        .button {
+            font-weight: bold;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, background-color 0.2s;
+            cursor: pointer;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .button:active {
+            transform: scale(0.95);
+        }
+        .button.correct {
+            background-color: #10b981; /* Green */
+            cursor: not-allowed;
+        }
+        .button.correct:hover {
+            transform: none;
+        }
+        .button.incorrect {
+            background-color: #ef4444; /* Red */
+        }
+        .answer-text {
+            color: #fff;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+            min-height: 2rem;
+        }
+        .explanation-text {
+            color: #a0a0a0;
+            margin-top: 1rem;
+            transition: opacity 0.5s;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center mb-6 text-white">Politeness & Conversation Quest</h1>
+        <p class="text-lg mb-8" id="question-counter"></p>
+
+        <div id="quiz-content">
+            <!-- Question card will be rendered here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { questionPt: "Como você diria 'Olá, como está?' de uma forma mais natural?", questionEn: "What's a natural way to say 'Olá, como está?' in English?", answer: "Hi there, how are you doing?", explanation: "This is a common, polite greeting. 'How are you doing?' is a great alternative. 👋" },
+            { questionPt: "Como você diria 'Olá, como vai?' de maneira informal?", questionEn: "How would you say 'Olá, como vai?' informally?", answer: "What's up?", explanation: "This is a very common informal greeting. You can also use 'How's it going?'." },
+            { questionPt: "Como você diria 'Olá, como está?' de maneira formal?", questionEn: "How would you say 'Olá, como está?' formally?", answer: "Hello, how are you?", explanation: "This is a polite and widely used greeting for more formal situations." },
+            { questionPt: "Como você diria 'E aí, beleza?' de maneira informal?", questionEn: "What's a common informal greeting in English?", answer: "What's up?", explanation: "The most common informal greeting is 'How's it going?' or simply 'What's up?'. 👍" },
+            { questionPt: "Como você diria 'Prazer em conhecê-lo' sem usar a frase 'Nice to meet you'?", questionEn: "How would you say 'Nice to meet you' without using the phrase?", answer: "It's a pleasure to make your acquaintance.", explanation: "This is a very polite and formal way to express pleasure in meeting someone. It's often used in professional settings. 🤝" },
+            { questionPt: "Como você traduziria a frase: 'O prazer é meu'?", questionEn: "How would you translate the phrase: 'O prazer é meu'?", answer: "The pleasure is mine.", explanation: "This phrase is a perfect, classic response to 'Nice to meet you!' or 'The pleasure is mine!'. 😊" },
+            { questionPt: "Como você diz 'Saudações'?", questionEn: "How do you say 'Saudações'?", answer: "Greetings.", explanation: "This is a formal way to say hello. It's often used in formal writing or in older contexts. 💌" },
+            { questionPt: "Como você diz 'apresentar' uma pessoa?", questionEn: "How do you say 'to introduce' a person?", answer: "To introduce a person.", explanation: "This is the verb for when you bring people together for the first time. 🗣️" },
+            { questionPt: "Como você diz 'apresentações'?", questionEn: "How do you say 'apresentações'?", answer: "Introductions.", explanation: "This is the noun for the action of presenting one person to another. 📚" },
+            { questionPt: "O que é uma 'Indução'?", questionEn: "What is an 'Induction'?", answer: "An introduction to a new job or role.", explanation: "The term is often used in a professional context to describe the process of training and integrating a new employee." },
+            { questionPt: "Como você diria 'E aí, como é que é, amigo?'?", questionEn: "How would you say 'E aí, como é que é, amigo?'?", answer: "What's up, man?", explanation: "This is a very informal and friendly way to greet someone. The tone is very casual. 🤙" },
+            { questionPt: "Como você diz 'Deixa que eu te apresento o Daby'?", questionEn: "How do you say 'Deixa que eu te apresento o Daby'?", answer: "Let me introduce you to Daby.", explanation: "The most common way to introduce someone. 🧑‍🤝‍🧑" },
+            { questionPt: "Escreva uma frase usando 'Pleased' como um verbo? Pleased significa 'satisfeito'.", questionEn: "Write a sentence using 'Pleased' as a verb? Pleased means 'satisfied'.", answer: "The good news pleased her.", explanation: "Pleased can also be an adjective, as in 'I was pleased to meet you.' 👏" },
+            { questionPt: "Escreva uma frase usando 'Favor' como um verbo.", questionEn: "Write a sentence using 'Favor' as a verb.", answer: "Could you favor me with a reply?", explanation: "In this context, 'favor' means to do a kind act for someone. It's often used in formal requests." },
+            { questionPt: "Como você pergunta 'Quantos anos você tem?'?", questionEn: "How do you ask 'Quantos anos você tem?'?", answer: "How old are you?", explanation: "This is a direct and standard way to ask someone's age. 🎂" },
+            { questionPt: "Como você diz 'Há quanto tempo não te vejo!'?", questionEn: "How do you say 'Há quanto tempo não te vejo!'?", answer: "How long have I not seen you!", explanation: "This is a great phrase for when you unexpectedly run into someone you haven't seen in a long time. 🕰️" },
+            { questionPt: "Como você traduziria a frase: 'Quanto tempo levou para ir ao centro da cidade'?", questionEn: "How would you translate the phrase: 'Quanto tempo levou para ir ao centro da cidade'?", answer: "How long did it take to get to the city center?", explanation: "'How long did it take?' is the standard way to ask about the duration of a past event." },
+            { questionPt: "Como você traduziria a frase: 'Quanto tempo vai demorar até a prefeitura'?", questionEn: "How would you translate the phrase: 'Quanto tempo vai demorar até a prefeitura'?", answer: "How long will it take to get to city hall?", explanation: "This question uses 'will it take' to ask about the duration of a future event." },
+            { questionPt: "Como você traduziria 'Meus avós são o mais velho casal'?", questionEn: "How would you translate 'Meus avós são o mais velho casal'?", answer: "My grandparents are the oldest couple.", explanation: "This phrase indicates that your grandparents have been together the longest. 👴👵" },
+            { questionPt: "Como você traduziria 'Meu bisavô é o mais novo'?", questionEn: "How would you translate 'Meu bisavô é o mais novo'?", answer: "My great-grandfather is the youngest.", explanation: "The term 'youngest' here means they are the most recent addition to the family line. 👶" },
+            { questionPt: "Como você pergunta 'Você tem irmãos e irmãs?'?", questionEn: "How do you ask 'Você tem irmãos e irmãs?'?", answer: "Do you have siblings?", explanation: "Siblings is a gender-neutral term for brothers and sisters. 👨‍👩‍👧‍👦" },
+            { questionPt: "Como você traduziria a frase: 'Sua irmã é idosa'?", questionEn: "How would you translate the phrase: 'Sua irmã é idosa'?", answer: "Your sister is elderly.", explanation: "This is a polite way to describe someone who is old. 👵" },
+            { questionPt: "Como você diria 'O mesmo para você! / igualmente?'", questionEn: "How would you say 'O mesmo para você! / igualmente?'", answer: "Same to you!", explanation: "This is a simple and common way to return a greeting or a wish. 'Likewise!' is a great alternative. 🔄" },
+            { questionPt: "Como você diria 'Por favor, entre'?", questionEn: "How would you say 'Por favor, entre'?", answer: "Please come in.", explanation: "This is a polite invitation to enter a place. 🚪" },
+            { questionPt: "Como você diria 'Com licença' para interromper alguém?", questionEn: "How would you say 'Com licença' to interrupt someone?", answer: "Excuse me.", explanation: "This is the most common and polite way to get someone's attention. 🙏" },
+            { questionPt: "Como você diria 'Com licença' para deixar um grupo?", questionEn: "How would you say 'Com licença' to leave a group?", answer: "Excuse me, please.", explanation: "Adding 'please' makes it even more polite when leaving a group. 🚶" },
+            { questionPt: "O que você diz educadamente quando não entende o que alguém disse?", questionEn: "What do you say politely when you don't understand what someone said?", answer: "I beg your pardon.", explanation: "This is a formal and very polite way to ask someone to repeat what they said. 👂" },
+            { questionPt: "Como você diz 'Me desculpe'?", questionEn: "How do you say 'Me desculpe'?", answer: "Sorry.", explanation: "This is a simple, common apology. 'I apologize' is more formal. 😔" },
+            { questionPt: "Como você diz 'De nada'?", questionEn: "How do you say 'De nada'?", answer: "You're welcome.", explanation: "This is the standard response to 'Thank you!'. 🙏" },
+            { questionPt: "Como você diz 'Não, obrigado; estou satisfeito'?", questionEn: "How do you say 'No, thank you; I am satisfied'?", answer: "No, thanks; I am satisfied.", explanation: "A polite way to decline an offer of food or drink. 'No, thanks, I'm good.' is more casual. 🍽️" },
+            { questionPt: "Como você traduziria a frase: 'Isso não é engraçado'?", questionEn: "How would you translate the phrase: 'Isso não é engraçado'?", answer: "That's not funny.", explanation: "A straightforward way to express that you don't find something humorous. 😐" },
+            { questionPt: "Como você traduziria a frase: 'Infelizmente, não estou satisfeito com a sua avaliação'?", questionEn: "How would you translate the phrase: 'Infelizmente, não estou satisfeito com a sua avaliação'?", answer: "Unfortunately, I am not satisfied with your assessment.", explanation: "A formal way to express disappointment. 'I'm not happy with the result' is more casual. 📊" },
+            { questionPt: "Como você traduziria a frase: 'O Presidente cumpre um mandato de 4 anos e não foi re-eleito'?", questionEn: "How would you translate the phrase: 'O Presidente cumpre um mandato de 4 anos e não foi re-eleito'?", answer: "The President serves a 4-year term and wasn't re-elected.", explanation: "The verb 'serve' is used for a term of office. 📜" },
+            { questionPt: "Como você traduziria a frase: 'Pelo jeito vai chover depois de amanhã.'?", questionEn: "How would you translate the phrase: 'Pelo jeito vai chover depois de amanhã.'?", answer: "It looks like it will rain the day after tomorrow.", explanation: "'The day after tomorrow' is a phrase for an event happening in two days. 🗓️" },
+            { questionPt: "Como você traduziria a frase: 'Tomara que a empresa me contrate'?", questionEn: "How would you translate the phrase: 'Tomara que a empresa me contrate'?", answer: "Hopefully, the company hires me.", explanation: "This expresses hope for a future event. 'I hope the company hires me' is a good alternative. 🙏" },
+            { questionPt: "Como você traduziria a frase: 'Vamos dar uma volta de carro?'?", questionEn: "How would you translate the phrase: 'Vamos dar uma volta de carro?'?", answer: "Let's go for a ride in the car?", explanation: "'Go for a ride' is a common phrase for a leisure trip in a car. 🚗" },
+            { questionPt: "Como você traduziria a frase: 'Me avisa se você mudar de idéia sobre isso'?", questionEn: "How would you translate the phrase: 'Me avisa se você mudar de idéia sobre isso'?", answer: "Let me know if you change my mind about that.", explanation: "The phrase 'change your mind' means to change your opinion or decision. 🤔" },
+            { questionPt: "Como você traduziria a frase: 'Vamos manter contato'?", questionEn: "How would you translate the phrase: 'Vamos manter contato'?", answer: "Let's stay in touch.", explanation: "A friendly farewell that expresses the wish to communicate again. 📱" },
+            { questionPt: "Como você traduziria a frase: 'Vamos contatar a ouvidoria'?", questionEn: "How would you translate the phrase: 'Vamos contatar a ouvidoria'?", answer: "Let's contact the ombudsman.", explanation: "An ombudsman is an official who investigates complaints. 🧑‍⚖️" },
+            { questionPt: "Como você traduziria a frase: 'Dê-me suas informações para o pagamento'?", questionEn: "How would you translate the phrase: 'Dê-me suas informações para o pagamento'?", answer: "Give me your information for the payment.", explanation: "A direct way to request information for a transaction. 💳" },
+            { questionPt: "Como você traduziria a frase: 'Deixe isso para eles'?", questionEn: "How would you translate the phrase: 'Deixe isso para eles'?", answer: "Leave this for them.", explanation: "This means to allow someone else to have something. 🎁" },
+            { questionPt: "Como você traduziria a frase: 'Deixe isso para eles fazer'?", questionEn: "How would you translate the phrase: 'Deixe isso para eles fazer'?", answer: "Let them do this.", explanation: "This means to permit someone to do something. 👥" },
+            { questionPt: "Como você diria 'Fique à vontade'?", questionEn: "How would you say 'Fique à vontade'?", answer: "Make yourself at home.", explanation: "This is a hospitable way to make a guest feel comfortable. 🏡" },
+            { questionPt: "Como você diria 'Passe bem' e 'Tenha uma boa semana'?", questionEn: "How would you say 'Passe bem' and 'Tenha uma boa semana'?", answer: "Have a good one. / Have a good week!", explanation: "'Have a good one' is a versatile and common farewell. 'Have a good week' is more specific. 👋" },
+            { questionPt: "Alguém espirra. O que você diria?", questionEn: "Someone sneezes. What do you say?", answer: "Bless you!", explanation: "This is a common phrase to say after someone sneezes. It's a sign of politeness. 🙏" },
+            { questionPt: "Como você diria 'O que você achou da reunião?'?", questionEn: "How would you say 'O que você achou da reunião?'?", answer: "How did the meeting go?", explanation: "This is a great, natural way to ask for an opinion on a recent event. 🧠" },
+            { questionPt: "Como você perguntaria 'Você está se divertindo?'?", questionEn: "How would you ask 'Você está se divertindo?'?", answer: "Are you enjoying yourself?", explanation: "This is a direct question to check if someone is having a good time. 🥳" },
+            { questionPt: "O que a expressão 'Pois não?' significa, e como é usada para oferecer ajuda educadamente?", questionEn: "What does the expression 'Pois não?' mean, and how is it used to offer help politely?", answer: "How can I help you?", explanation: "This is a very polite way to offer assistance. It can also be used as a polite 'Yes?' when you answer the phone or a doorbell. 💁" },
+            { questionPt: "Como você traduziria 'Faça os convidados entrar'?", questionEn: "How would you translate 'Faça os convidados entrar'?", answer: "Let the guests in.", explanation: "The phrase 'Let them in' means to permit someone to enter. 🚶" },
+            { questionPt: "Como você traduziria 'Sirva-se'?", questionEn: "How would you translate 'Sirva-se'?", answer: "Help yourself.", explanation: "This is an invitation to take food or drink without needing to ask permission. 😋" },
+            { questionPt: "Como você traduziria 'Como foi o fim de semana?'?", questionEn: "How would you translate 'Como foi o fim de semana?'?", answer: "How was the weekend?", explanation: "A common question to ask on a Monday morning. 📅" },
+            { questionPt: "Como você traduziria 'Como foi o dia no trabalho?'?", questionEn: "How would you translate 'Como foi o dia no trabalho?'?", answer: "How was the day at work?", explanation: "A great way to check in with a friend or partner after their workday. 💼" },
+            { questionPt: "Como você traduziria 'Foi bem corrido'?", questionEn: "How would you translate 'Foi bem corrido'?", answer: "It was very busy.", explanation: "A very useful phrase for describing a hectic day. 💨" },
+            { questionPt: "Como você traduziria 'Não importa, esta ou esta!'?", questionEn: "How would you translate 'Não importa, esta ou esta!'?", answer: "It doesn't matter which.", explanation: "This is used when either choice is fine with you. 'Either way is fine' is a good alternative. ⚖️" },
+            { questionPt: "Como você traduziria 'Parece que'?", questionEn: "How would you translate 'Parece que'?", answer: "It seems that.", explanation: "This phrase indicates that something appears to be true, but you aren't completely certain. 🤔" },
+            { questionPt: "Como você traduziria 'Será que'?", questionEn: "How would you translate 'Será que'?", answer: "Do you think that.", explanation: "This is a way to ask someone's opinion or belief about something. 'I wonder if...' is a good alternative. 🧐" },
+            { questionPt: "Como você traduziria 'Já já'?", questionEn: "How would you translate 'Já já'?", answer: "In a minute.", explanation: "This phrase indicates something will happen very soon. ⏱️" },
+            { questionPt: "Como você traduziria 'Acoustomar-se'?", questionEn: "How would you translate 'Acoustomar-se'?", answer: "To get used to.", explanation: "This is a verb that means to become accustomed to something. 🔄" },
+            { questionPt: "Como você traduziria 'Aprender a se comunicar bem com as expressoes idiomaticas'?", questionEn: "How would you translate 'Aprender a se comunicar bem com as expressoes idiomaticas'?", answer: "Learning to communicate well with idiomatic expressions.", explanation: "This is a great goal for any language learner! 🗣️" },
+            { questionPt: "Como você traduziria 'Foi um prazer'?", questionEn: "How would you translate 'Foi um prazer'?", answer: "It was a pleasure.", explanation: "This is a polite closing statement after a social interaction. 👋" },
+            { questionPt: "Como você traduziria 'Por mim, tudo bem'?", questionEn: "How would you translate 'Por mim, tudo bem'?", answer: "That's fine by me.", explanation: "This indicates that you are okay with a plan or decision, without using 'for' or 'to'. 😌" },
+            { questionPt: "Como você traduziria 'Você que sabe'?", questionEn: "How would you translate 'Você que sabe'?", answer: "It's up to you.", explanation: "This means that the other person gets to make the decision. 🤷" },
+            { questionPt: "Como você traduziria 'Faça-os visitar o predio'?", questionEn: "How would you translate 'Faça-os visitar o predio'?", answer: "Let them tour the building.", explanation: "The verb 'tour' means to make a journey for pleasure in which you visit several different places. 🏢" },
+            { questionPt: "Como você traduziria 'Posso entrar? Sim, entre.'?", questionEn: "How would you translate 'Posso entrar? Sim, entre.'?", answer: "Can I come in? Yes, come in.", explanation: "The standard way to ask permission to enter a room or building. 🚶" },
+            { questionPt: "Qual a expressão que você usaria para desejar a alguém um bom fim de semana?", questionEn: "What expression would you use to wish someone a good weekend?", answer: "Have a good weekend.", explanation: "A very common and polite phrase for a Friday afternoon. 📅" },
+            { questionPt: "Como você diria 'Volto em 5 minutos'?", questionEn: "How would you say 'Volto em 5 minutos'?", answer: "I'll be back in 5 minutes.", explanation: "This is a clear statement that you are leaving for a short period of time. 🏃" },
+            { questionPt: "Como você diria 'Estou com pressa'?", questionEn: "How would you say 'Estou com pressa'?", answer: "I'm in a rush.", explanation: "This is a good phrase to use when you need to hurry somewhere. ⏰" },
+            { questionPt: "Como você diria 'Estou ocupado, te ligo depois'?", questionEn: "How would you say 'Estou ocupado, te ligo depois'?", answer: "I'm busy, I'll call you later.", explanation: "A polite way to end a conversation because you are occupied. 📞" },
+            { questionPt: "Como você traduziria a frase: 'Faça de conta que está em casa.'?", questionEn: "How would you translate the phrase: 'Faça de conta que está em casa.'?", answer: "Make yourself at home.", explanation: "This is a hospitable way to make a guest feel comfortable. 🏡" },
+            { questionPt: "Como você traduziria a frase: 'Estamos na mesa. Posso me servir?'?", questionEn: "How would you translate the phrase: 'Estamos na mesa. Posso me servir?'?", answer: "We are at the table. Can I help myself?", explanation: "This is a polite way to ask to take food at a meal. 🍽️" },
+            { questionPt: "Como você traduziria 'Pelo jeito, ele é o dono da loja'?", questionEn: "How would you translate 'Pelo jeito, ele é o dono da loja'?", answer: "It seems like he is the owner of the store.", explanation: "This means that it appears to you that he is the owner. 🏪" },
+            { questionPt: "Como você traduziria 'Será que vai me pagar por o serviço?'?", questionEn: "How would you translate 'Será que vai me pagar por o serviço?'?", answer: "Will he pay me for the service?", explanation: "This is a direct question about payment. 💰" },
+            { questionPt: "Como você traduziria 'Será que ele vai entregar o projeto no tempo'?", questionEn: "How would you translate 'Será que ele vai entregar o projeto no tempo'?", answer: "Will he deliver the project on time?", explanation: "'On time' means at the arranged time. ⏳" },
+            { questionPt: "Como você traduziria 'Tomara que o meu chefe aprova o orçamento'?", questionEn: "How would you translate 'Tomara que o meu chefe aprova o orçamento'?", answer: "Hopefully, my boss will approve the budget.", explanation: "This expresses hope for a future event. 'I hope my boss...' is a good alternative. 🙏" },
+            { questionPt: "Como você traduziria 'Tomara que dá tudo certo na reunião com a nova contratação'?", questionEn: "How would you translate 'Tomara que dá tudo certo na reunião com a nova contratação'?", answer: "Hopefully, everything goes well at the meeting with the new hire.", explanation: "This is a great phrase for expressing hope for a future event. 🤞" },
+            { questionPt: "Como você traduziria 'Me passe os seus dados para o pagamento'?", questionEn: "How would you translate 'Me passe os seus dados para o payment'?", answer: "Give me your information for the payment.", explanation: "A direct way to request information for a transaction. 💳" },
+            { questionPt: "Como você traduziria a frase: 'Boa viagem' (carro)?", questionEn: "How would you translate the phrase: 'Boa viagem' (car)?", answer: "Have a good trip!", explanation: "This is a common and polite way to wish someone a good journey by car. 🚗" },
+            { questionPt: "Como você traduziria a frase: 'Boa viagem' (avião)?", questionEn: "How would you translate the phrase: 'Boa viagem' (avião)?", answer: "Have a good trip!", explanation: "This is a common and polite way to wish someone a good journey by plane. ✈️" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let hintTimeout;
+
+        const quizContent = document.getElementById('quiz-content');
+        const questionCounter = document.getElementById('question-counter');
+
+        function renderQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                renderFinalScreen();
+                return;
+            }
+
+            const q = questions[currentQuestionIndex];
+            quizContent.innerHTML = `
+                <div class="question-card">
+                    <div class="w-full text-center mb-6">
+                        <p class="text-lg sm:text-xl font-medium question-text-pt">${q.questionPt}</p>
+                        <p class="text-lg sm:text-xl font-medium question-text-en mt-2">${q.questionEn}</p>
+                    </div>
+                    <div class="w-full mb-6">
+                        <input type="text" id="answer-input" placeholder="Digite sua resposta aqui...">
+                    </div>
+                    <div class="flex space-x-4">
+                        <button id="check-button" class="button bg-indigo-600 hover:bg-indigo-500 text-white">
+                            Verificar Resposta
+                        </button>
+                        <button id="hint-button" class="button bg-gray-600 hover:bg-gray-500 text-white">
+                            Dica
+                        </button>
+                    </div>
+                    <p id="feedback-text" class="text-lg mt-4" style="min-height: 2rem;"></p>
+                    <p id="explanation-text" class="explanation-text text-sm sm:text-base"></p>
+                </div>
+            `;
+            updateCounter();
+            attachEventListeners();
+        }
+
+        function renderFinalScreen() {
+            quizContent.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold mb-4">Quiz Concluído!</h2>
+                    <p class="text-xl">Sua pontuação final é ${score} de ${questions.length}.</p>
+                    <button onclick="restartQuiz()" class="button bg-indigo-600 hover:bg-indigo-500 text-white mt-6">
+                        Recomeçar
+                    </button>
+                </div>
+            `;
+            questionCounter.textContent = "";
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            renderQuestion();
+        }
+
+        function updateCounter() {
+            questionCounter.textContent = `Questão ${currentQuestionIndex + 1} de ${questions.length}`;
+        }
+
+        function attachEventListeners() {
+            const inputEl = document.getElementById('answer-input');
+            const checkButton = document.getElementById('check-button');
+            const hintButton = document.getElementById('hint-button');
+            const feedbackText = document.getElementById('feedback-text');
+            const explanationText = document.getElementById('explanation-text');
+
+            // Clear any previous hint timeout when a new question is loaded
+            if (hintTimeout) {
+                clearTimeout(hintTimeout);
+            }
+
+            checkButton.addEventListener('click', () => {
+                const userAnswer = inputEl.value.trim().toLowerCase();
+                const correctAnswer = questions[currentQuestionIndex].answer.toLowerCase();
+
+                if (userAnswer === correctAnswer) {
+                    feedbackText.textContent = "Correto! ✅";
+                    feedbackText.style.color = '#10b981';
+                    explanationText.textContent = questions[currentQuestionIndex].explanation;
+                    explanationText.style.opacity = 1;
+                    score++;
+                    checkButton.disabled = true;
+                    hintButton.disabled = true;
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        renderQuestion();
+                    }, 2000);
+                } else {
+                    feedbackText.textContent = "Incorreto. Tente novamente!";
+                    feedbackText.style.color = '#ef4444';
+                    inputEl.value = ''; // Clear the input field for a new try
+                    // Re-enable hint button if an incorrect attempt is made
+                    hintButton.disabled = false; 
+                }
+            });
+
+            hintButton.addEventListener('click', () => {
+                const correctAnswer = questions[currentQuestionIndex].answer;
+                let hintText = '';
+                let i = 0;
+
+                // Clear any previous hint timeout
+                if (hintTimeout) {
+                    clearTimeout(hintTimeout);
+                }
+
+                // Disable the hint button after it's clicked
+                hintButton.disabled = true;
+                // Keep the check button enabled
+                inputEl.disabled = false;
+
+                feedbackText.textContent = `Dica: `;
+                feedbackText.style.color = '#fff';
+                explanationText.style.opacity = 0;
+
+                function revealNextLetter() {
+                    if (i < correctAnswer.length) {
+                        hintText += correctAnswer[i];
+                        feedbackText.textContent = `Dica: ${hintText}`;
+                        i++;
+                        hintTimeout = setTimeout(revealNextLetter, 150); // Reveal one letter every 150ms
+                    } else {
+                        // All buttons should be enabled at the end of the hint, except the hint button itself which remains disabled for this question.
+                        checkButton.disabled = false;
+                        inputEl.disabled = false;
+                    }
+                }
+                
+                revealNextLetter();
+            });
+        }
+
+        // Initialize the quiz
+        window.onload = renderQuestion;
+    </script>
+</body>
+</html>
